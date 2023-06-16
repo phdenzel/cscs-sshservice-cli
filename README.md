@@ -96,17 +96,17 @@ ssh-add -t 1d ~/.ssh/cscs_signed_key
 ```
 2. Connect to the login node using the ssh-agent's CSCS keys:
 ```bash
-$ ssh -A $USERNAME@<CSCS-LOGIN-NODE>
+$ ssh -A <USERNAME>@<CSCS-LOGIN-NODE>
 ```
 Note, if the key is not added to the SSH agent as mentioned in step 1, then use:
 ```bash
-$ ssh -i {args.key_name} <CSCS-LOGIN-NODE>
+$ ssh -i ~/.ssh/cscs_signed_key <CSCS-LOGIN-NODE>
 ```
 or add an entry to your `~/.ssh/config`, e.g.
 ```config
 Host cscs
-  Hostname ela.cscs.ch
-  User my_username
+  Hostname <CSCS-LOGIN-NODE>
+  User <USERNAME>
   IdentityFile ~/.ssh/cscs_signed_key
 ```
 
