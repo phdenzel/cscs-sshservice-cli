@@ -76,7 +76,7 @@ cscs-keygen --use_pass
 In this mode, the script looks by default for `cscs.ch` in the
 password-store to fetch username and password, and for `otp/cscs.sh`
 to obtain the OTP code (provided it contains the otpauth URI).  This
-way, there is no need to deal with prompts or manually user credential
+way, there is no need to deal with prompts or manual user credential
 inputs.
 
 If the passwords have been saved in non-default locations in the
