@@ -97,7 +97,7 @@ def parse_args():
     parser.add_argument('-a', '--api_uri', type=str,
                         default='https://sshservice.cscs.ch/api/v1/auth/ssh-keys/signed-key',
                         help='CSCS SSH key signing API identifier.')
-    parser.add_argument('-i', '--key_name', type=str, default='~/.ssh/cscs_signed_key',
+    parser.add_argument('-f', '--key_name', type=str, default='~/.ssh/cscs_signed_key',
                         help='Name of the SSH key file.')
     parser.add_argument('--use_passphrase', action='store_true',
                         help='Add a passphrase to the generated ssh keys.')
