@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cscs_keygen"
+version = "0.1.dev0"
+description = "Utility script to fetch CSCS' CA-signed SSH keys from API"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Philipp Denzel", email = "phdenzel@gmail.com"},
+  {name = "Massimo Benini"},
+]
+keywords = ["ssh", "keys", "CSCS"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Security"]
+dependencies = [
+  "requests==2.25.1",
+  "passpy==1.0.2",
+  "pyotp==2.8.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/phdenzel/cscs-sshservice-cli"
+"Bug Tracker" = "https://github.com/eth-cscs/sshservice-cli/issues"
+
+[project.scripts]
+cscs-keygen = "cscs_keygen.__main__:main"
