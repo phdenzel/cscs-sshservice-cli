@@ -18,7 +18,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 #    AUTHORS Massimo Benini
-
+#
+# Modified by
+#    AUTHORS Philipp Denzel
 
 function ProgressBar {
 # Process data
@@ -35,46 +37,49 @@ function ProgressBar {
 printf "\rSetting the environment : [${_fill// /#}${_empty// /-}] ${_progress}%%"
 }
 
-#Variables
+
+# Variables
 _start=1
-#This accounts as the "totalState" variable for the ProgressBar function
+# This accounts as the "totalState" variable for the ProgressBar function
 _end=100
 
-#Params
+# Params
 MFA_KEYS_URL="https://sshservice.cscs.ch/api/v1/auth/ssh-keys/signed-key"
 
-#Detect OS
+# Detect OS
 OS="$(uname)"
 case "${OS}" in
-  'Linux')
-    OS='Linux'
-    ;;
-  'FreeBSD')
-    OS='FreeBSD'
-    ;;
-  'WindowsNT')
-    OS='Windows'
-    ;;
-  'Darwin')
-    OS='Mac'
-    ;;
-  *) ;;
+    'Linux')
+        OS='Linux'
+        ;;
+    'FreeBSD')
+        OS='FreeBSD'
+        ;;
+    'WindowsNT')
+        OS='Windows'
+        ;;
+    'Darwin')
+        OS='Mac'
+        ;;
+    *) ;;
 esac
 
 #OS validation
 if [ "${OS}" != "Mac" ] && [ "${OS}" != "Linux" ]; then
-  echo "This script works only on Mac-OS or Linux. Abording."
+  echo "This script works only on Mac-OS or Linux. Aborting."
   exit 1
 fi
 
-#Read Inputs
-read -p "Username : " USERNAME
-read -s -p "Password: " PASSWORD
-echo
-read -s -p "Enter OTP (6-digit code): " OTP
-echo
+# Read Inputs using UNIX pass
+USERNAME="pdenzel"
+PASSWORD=`pass cscs.ch | head -n 1`
+OTP=`pass otp otp/cscs.ch`
+echo " Username:  $USERNAME"
+echo " Password:  *********"
+echo " OTP code:  $OTP"
 
-#Validate inputs
+
+# Validate inputs
 if ! [[ "${USERNAME}" =~ ^[[:lower:]_][[:lower:][:digit:]_-]{2,15}$ ]]; then
     echo "Username is not valid."
     exit 1
@@ -93,7 +98,7 @@ fi
 ProgressBar 25 "${_end}"
 echo "  Authenticating to the SSH key service..."
 
-HEADERS=(-H "Content-Type: application/json" -H "accept: application/json")
+HEADERS=(-H "Content-Type: application/json" -H "Accept: application/json")
 KEYS=$(curl -s -S --ssl-reqd \
     "${HEADERS[@]}" \
     -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\", \"otp\": \"$OTP\"}" \
@@ -117,7 +122,7 @@ fi
 PUBLIC=$(echo ${KEYS} | cut -d \" -f 4)
 PRIVATE=$(echo ${KEYS} | cut -d \" -f 8)
 
-#Check if keys are empty:
+# Check if keys are empty:
 if [ -z "${PUBLIC}" ] || [ -z "${PRIVATE}" ]; then
     echo "Error fetching the SSH keys. Aborting."
     exit 1
@@ -126,58 +131,58 @@ fi
 ProgressBar 75 "${_end}"
 echo "  Setting up the SSH keys into your home folder..."
 
-#Check ~/.ssh folder and store the keys
-echo ${PUBLIC} | awk '{gsub(/\\n/,"\n")}1' > ~/.ssh/cscs-key-cert.pub || exit 1
-echo ${PRIVATE} | awk '{gsub(/\\n/,"\n")}1' > ~/.ssh/cscs-key || exit 1
+# Check ~/.ssh folder and store the keys
+CSCS_KEYNAME_PUB=~/.ssh/cscs_signed_key.pub
+CSCS_KEYNAME=~/.ssh/cscs_signed_key
+echo ${PUBLIC} | awk '{gsub(/\\n/,"\n")}1' > $CSCS_KEYNAME_PUB || exit 1
+echo ${PRIVATE} | awk '{gsub(/\\n/,"\n")}1' > $CSCS_KEYNAME || exit 1
 
-#Setting permissions:
-chmod 644 ~/.ssh/cscs-key-cert.pub || exit 1
-chmod 600 ~/.ssh/cscs-key || exit 1
+#  Setting permissions:
+chmod 644 $CSCS_KEYNAME_PUB || exit 1
+chmod 600 $CSCS_KEYNAME || exit 1
 
-#Format the keys:
-if [ "${OS}" = "Mac" ]
-then
-  sed -i '' -e '$ d' ~/.ssh/cscs-key-cert.pub || exit 1
-  sed -i '' -e '$ d' ~/.ssh/cscs-key || exit 1
-else [ "${OS}" = "Linux" ]
-  sed '$d' ~/.ssh/cscs-key-cert.pub || exit 1
-  sed '$d' ~/.ssh/cscs-key || exit 1
+# Format the keys:
+if [ "${OS}" = "Mac" ]; then
+    sed -i '' -e '$ d' $CSCS_KEYNAME_PUB || exit 1
+    sed -i '' -e '$ d' $CSCS_KEYNAME || exit 1
+elif [ "${OS}" = "Linux" ]; then
+    sed '$d' $CSCS_KEYNAME_PUB || exit 1
+    sed '$d' $CSCS_KEYNAME || exit 1
 fi
 
 ProgressBar 100 "${_end}"
 echo "  Completed."
 
 exit_code_passphrase=1
-read -n 1 -p "Do you want to add a passphrase to your key? [y/n] (Default y) " reply; 
-if [ "$reply" != "" ];
- then echo;
+read -n 0 -p "Do you want to add a passphrase to your key? [y/N] " reply;
+if [ "$reply" != "" ]; then
+    echo;
 fi
 if [ "$reply" = "${reply#[Nn]}" ]; then
-      while [ $exit_code_passphrase != 0 ]; do
-        ssh-keygen -f ~/.ssh/cscs-key -p
+    while [ $exit_code_passphrase != 0 ]; do
+        ssh-keygen -f $CSCS_KEYNAME -p
         exit_code_passphrase=$?
-      done
+    done
 fi
 
-if (( $exit_code_passphrase == 0 ));
-  then
+if (( $exit_code_passphrase == 0 )); then
     SUBSTRING=", using the passphrase you have set:";
-  else
-     SUBSTRING=":";
-fi     
+else
+    SUBSTRING=":";
+fi   
 
 cat << EOF
 
 Usage:
 
 1. Add the key to the SSH agent${SUBSTRING}
-ssh-add -t 1d ~/.ssh/cscs-key
+$ ssh-add -t 1d ~/.ssh/cscs_signed_key
 
 2. Connect to the login node using CSCS keys:
-ssh -A your_username@<CSCS-LOGIN-NODE>
+$ ssh -A $USERNAME@<CSCS-LOGIN-NODE>
 
-Note - if the key not is added to the SSH agent as mentioned in the step-1 above then use the command:
-ssh -i ~/.ssh/cscs-key <CSCS-LOGIN-NODE>
+Note, if the key is not added to the SSH agent as mentioned in step 1, then use:
+$ ssh -i ~/.ssh/cscs_signed_key <CSCS-LOGIN-NODE>
 
 EOF
 
