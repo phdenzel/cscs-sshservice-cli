@@ -21,9 +21,9 @@ classifiers = [
     "Operating System :: MacOS",
     "Topic :: Security"]
 dependencies = [
-  "requests==2.25.1",
-  "passpy==1.0.2",
-  "pyotp==2.8.0",
+  "requests",
+  "passpy",
+  "pyotp",
 ]
 
 [project.urls]
