@@ -7,7 +7,7 @@ name = "cscs_keygen"
 version = "0.1.dev0"
 description = "Utility script to fetch CSCS' CA-signed SSH keys from API"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 authors = [
   {name = "Philipp Denzel", email = "phdenzel@gmail.com"},
