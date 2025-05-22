@@ -38,6 +38,7 @@ let
     };
     doCheck = false;
   };
-in [
-  pythonPackage
-]
+in
+
+pythonPackage
+
