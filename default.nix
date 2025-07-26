@@ -24,7 +24,7 @@ let
   passpy = pkgs.python312Packages.buildPythonPackage {
     pname = "passpy";
     version = "1.0.2";
-    pyproject = true;
+    format = "pyproject";
     build-system = with pkgs.python312Packages; [ setuptools ];
     propagatedBuildInputs = with pkgs.python312Packages; [
       gitpython
