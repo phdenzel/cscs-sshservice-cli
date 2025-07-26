@@ -6,7 +6,7 @@
 let 
   pythonPackage = pkgs.python312Packages.buildPythonApplication {
     pname = "cscs-keygen";
-    version = "0.1.dev0";
+    version = "0.1.dev1";
     format = "pyproject";
     build-system = with pkgs.python312Packages; [hatchling];
     propagatedBuildInputs = with pkgs.python312Packages; [
