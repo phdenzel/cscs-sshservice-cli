@@ -4,12 +4,12 @@
   # subdir ? "",
 }:
 let 
-  pythonPackage = pkgs.python312Packages.buildPythonApplication {
+  pythonPackage = pkgs.python313Packages.buildPythonApplication {
     pname = "cscs-keygen";
-    version = "0.1.dev1";
+    version = "0.1.dev3";
     format = "pyproject";
-    build-system = with pkgs.python312Packages; [hatchling];
-    propagatedBuildInputs = with pkgs.python312Packages; [
+    build-system = with pkgs.python313Packages; [hatchling];
+    propagatedBuildInputs = with pkgs.python313Packages; [
       requests
       passpy
       pyotp
@@ -21,12 +21,12 @@ let
       meta.description.license = pkgs.lib.licenses.gpl3;
     };
   };
-  passpy = pkgs.python312Packages.buildPythonPackage {
+  passpy = pkgs.python313Packages.buildPythonPackage {
     pname = "passpy";
     version = "1.0.2";
     format = "setuptools";
-    build-system = with pkgs.python312Packages; [ setuptools ];
-    propagatedBuildInputs = with pkgs.python312Packages; [
+    build-system = with pkgs.python313Packages; [ setuptools ];
+    propagatedBuildInputs = with pkgs.python313Packages; [
       gitpython
       python-gnupg
       pyperclip
